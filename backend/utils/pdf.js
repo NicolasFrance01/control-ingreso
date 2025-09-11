@@ -17,7 +17,6 @@ function generarPDF(registros, fecha) {
         doc.fontSize(18).text("Reporte de Ingresos y Salidas", { align: "center" });
         doc.moveDown();
         doc.fontSize(12).text(`Fecha: ${fecha}`);
-
         doc.moveDown();
 
         registros.forEach(r => {
@@ -39,14 +38,18 @@ function generarPDF(registros, fecha) {
             doc.text(`Salida: ${salida ? salida.toLocaleString("es-AR") : "Pendiente"}`);
             doc.text(`Horas trabajadas: ${tiempoTrabajado}`);
             doc.text(`IP: ${r.ip}`);
-            doc.text(`Salida: ${registro.salida ? registro.salida : "Pendiente"}`);
-            doc.text(`Horas trabajadas: ${registro.horasTrabajadas ? registro.horasTrabajadas : "Pendiente"}`);
 
+            // Enlace a Maps para ingreso
+            if (r.ubicacionIngreso) {
+                const urlMaps = `https://www.google.com/maps?q=${r.ubicacionIngreso.lat},${r.ubicacionIngreso.lon}`;
+                doc.fillColor("blue").text("Ver ubicación de ingreso en Maps", { link: urlMaps, underline: true });
+                doc.fillColor("black");
+            }
 
-            // Enlace a Maps si tiene ubicación guardada
-            if (r.lat && r.lng) {
-                const urlMaps = `https://www.google.com/maps?q=${r.lat},${r.lng}`;
-                doc.fillColor("blue").text("Ver ubicación en Maps", { link: urlMaps, underline: true });
+            // Enlace a Maps para salida
+            if (r.ubicacionSalida) {
+                const urlMaps = `https://www.google.com/maps?q=${r.ubicacionSalida.lat},${r.ubicacionSalida.lon}`;
+                doc.fillColor("blue").text("Ver ubicación de salida en Maps", { link: urlMaps, underline: true });
                 doc.fillColor("black");
             }
         });
@@ -59,4 +62,3 @@ function generarPDF(registros, fecha) {
 }
 
 module.exports = { generarPDF };
-
