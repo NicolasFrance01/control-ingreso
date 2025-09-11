@@ -23,7 +23,7 @@ async function login() {
             window.currentRegistro = data.registro;
 
             // Solo mostrar botón de PDF si es el usuario con DNI 41847034
-            if (data.registro.dni === "41847034") {
+            if (String(data.registro.dni) === "41847034") {
                 document.getElementById("pdf-button").classList.remove("hidden");
             }
         } else {
@@ -79,3 +79,4 @@ function descargarPDF() {
     const hoy = new Date().toISOString().split("T")[0];
     window.open(`${backendURL}/pdf?fecha=${hoy}`, "_blank");
 }
+
