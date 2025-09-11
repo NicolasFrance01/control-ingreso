@@ -29,7 +29,7 @@ async function login() {
         window.currentRegistro = data.registro;
 
         // botón para generar PDF SOLO si es el user 41847034
-        if (dni === "41847034") {
+        if (dni === 41847034 ) {
           document.getElementById("pdfBtn").classList.remove("hidden");
         }
       } else {
@@ -84,3 +84,4 @@ async function registrarSalida() {
 function descargarPDF() {
   window.open(`${backendURL}/generar-pdf`, "_blank");
 }
+
