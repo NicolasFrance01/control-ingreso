@@ -1,4 +1,4 @@
-const backendURL = "https://control-ingreso.onrender.com"; // URL de tu backend en Render
+const backendURL = "https://control-ingreso.onrender.com";
 
 async function login() {
     const dni = document.getElementById("username").value;
@@ -11,17 +11,11 @@ async function login() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ dni, clave })
         });
-
         const data = await res.json();
-
         if (data.ok) {
             document.getElementById("login-container").classList.add("hidden");
             document.getElementById("dashboard-container").classList.remove("hidden");
-
-            // Mostrar mensaje con horario de ingreso
             document.getElementById("status").textContent = `Ingreso correcto: ${new Date(data.registro.ingreso).toLocaleTimeString()}`;
-
-            // Guardamos info del registro para registrar salida
             window.currentRegistro = data.registro;
         } else {
             error.textContent = data.msg;
@@ -45,27 +39,40 @@ function logout() {
 async function registrarIngreso() {
     if (!window.currentRegistro) return;
 
-    document.getElementById("status").textContent = "Ingreso registrado ✅";
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+        window.currentRegistro.ubicacion = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+        document.getElementById("status").textContent = "Ingreso registrado ✅";
 
-    // Opcional: enviar un fetch al backend si querés guardar algo extra
+        await fetch(`${backendURL}/login`, { // opcional: guardar ingreso con ubicación
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(window.currentRegistro)
+        });
+    }, () => {
+        document.getElementById("status").textContent = "Ingreso registrado sin ubicación ❌";
+    });
 }
 
 async function registrarSalida() {
     if (!window.currentRegistro) return;
-    try {
+
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+        const ubicacionSalida = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+
         const res = await fetch(`${backendURL}/salida`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ dni: window.currentRegistro.dni })
+            body: JSON.stringify({ dni: window.currentRegistro.dni, ubicacionSalida })
         });
         const data = await res.json();
+
         if (data.ok) {
             document.getElementById("status").textContent = `Salida registrada: ${new Date(data.registro.salida).toLocaleTimeString()}`;
+            window.currentRegistro = null;
         } else {
             document.getElementById("status").textContent = data.msg;
         }
-    } catch (err) {
-        console.error(err);
-        document.getElementById("status").textContent = "Error conectando con el servidor";
-    }
+    }, () => {
+        document.getElementById("status").textContent = "Salida registrada sin ubicación ❌";
+    });
 }
