@@ -52,18 +52,15 @@ async function registrarIngreso() {
 
 async function registrarSalida() {
     if (!window.currentRegistro) return;
-    
     try {
         const res = await fetch(`${backendURL}/salida`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ dni: window.currentRegistro.dni })
         });
-
         const data = await res.json();
-
         if (data.ok) {
-            document.getElementById("status").textContent = `Salida registrada: ${new Date(data.registro.salida).toLocaleTimeString()} ✅`;
+            document.getElementById("status").textContent = `Salida registrada: ${new Date(data.registro.salida).toLocaleTimeString()}`;
         } else {
             document.getElementById("status").textContent = data.msg;
         }
