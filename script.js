@@ -52,7 +52,7 @@ async function registrarIngreso() {
 
 async function registrarSalida() {
     if (!window.currentRegistro) return;
-
+    
     try {
         const res = await fetch(`${backendURL}/salida`, {
             method: "POST",
@@ -61,10 +61,11 @@ async function registrarSalida() {
         });
 
         const data = await res.json();
+
         if (data.ok) {
-            document.getElementById("status").textContent = `Salida registrada: ${new Date(data.registro.salida).toLocaleTimeString()}`;
+            document.getElementById("status").textContent = `Salida registrada: ${new Date(data.registro.salida).toLocaleTimeString()} ✅`;
         } else {
-            document.getElementById("status").textContent = "Error registrando salida";
+            document.getElementById("status").textContent = data.msg;
         }
     } catch (err) {
         console.error(err);
