@@ -3,71 +3,59 @@ const fs = require("fs");
 const path = require("path");
 
 function generarPDF(registros, fecha) {
-    return new Promise((resolve, reject) => {
-        const dir = path.join("./data/pdfs");
-        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  return new Promise((resolve, reject) => {
+    const dir = path.join("./data/pdfs");
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
-        const filePath = path.join(dir, `registros_${fecha}.pdf`);
-        const doc = new PDFDocument({ margin: 30 });
+    const filePath = path.join(dir, `registros_${fecha}.pdf`);
+    const doc = new PDFDocument({ margin: 30 });
 
-        const stream = fs.createWriteStream(filePath);
-        doc.pipe(stream);
+    const stream = fs.createWriteStream(filePath);
+    doc.pipe(stream);
 
-        // Título
-        doc.fontSize(18).text("Reporte de Ingresos y Salidas", { align: "center" });
-        doc.moveDown();
-        doc.fontSize(12).text(`Fecha: ${fecha}`);
-        doc.moveDown();
+    // Título
+    doc.fontSize(18).text("Reporte de Ingresos y Salidas", { align: "center" });
+    doc.moveDown();
+    doc.fontSize(12).text(`Fecha: ${fecha}`);
+    doc.moveDown();
 
-        registros.forEach(r => {
-            //const ingreso = r.ingreso ? new Date(r.ingreso) : null;
-            //const salida = r.salida ? new Date(r.salida) : null;
-            const opcionesHora = { timeZone: "America/Argentina/Buenos_Aires", hour12: false };
+    const opcionesHora = { timeZone: "America/Argentina/Buenos_Aires", hour12: false };
 
-            const ingreso = r.ingreso ? new Date(r.ingreso).toLocaleString("es-AR", opcionesHora) : "No registrado";
-            const salida = r.salida ? new Date(r.salida).toLocaleString("es-AR", opcionesHora) : "Pendiente";
-            
-            doc.text(`Ingreso: ${ingreso}`);
-            doc.text(`Salida: ${salida}`);
-            doc.text(`Ubicación de ingreso: ${r.ubicacionIngreso ? `Lat: ${r.ubicacionIngreso.lat}, Lng: ${r.ubicacionIngreso.lng}` : "No disponible"}`);
-            
-            let tiempoTrabajado = "Pendiente";
-            if (ingreso && salida) {
-                const diffMs = salida - ingreso;
-                const horas = Math.floor(diffMs / (1000 * 60 * 60));
-                const minutos = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-                const segundos = Math.floor((diffMs % (1000 * 60)) / 1000);
-                tiempoTrabajado = `${horas}h ${minutos}m ${segundos}s`;
-            }
+    registros.forEach(r => {
+      const ingresoDate = r.ingreso ? new Date(r.ingreso) : null;
+      const salidaDate = r.salida ? new Date(r.salida) : null;
 
-            doc.moveDown();
-            doc.text(`DNI: ${r.dni} | Nombre: ${r.nombre}`);
-            doc.text(`Ingreso: ${ingreso ? ingreso.toLocaleString("es-AR") : "No registrado"}`);
-            doc.text(`Salida: ${salida ? salida.toLocaleString("es-AR") : "Pendiente"}`);
-            doc.text(`Horas trabajadas: ${tiempoTrabajado}`);
-            doc.text(`IP: ${r.ip}`);
+      // Calcular horas trabajadas
+      let tiempoTrabajado = "Pendiente";
+      if (ingresoDate && salidaDate) {
+        const diffMs = salidaDate - ingresoDate;
+        const horas = Math.floor(diffMs / (1000 * 60 * 60));
+        const minutos = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+        const segundos = Math.floor((diffMs % (1000 * 60)) / 1000);
+        tiempoTrabajado = `${horas}h ${minutos}m ${segundos}s`;
+      }
 
-            // Enlace a Maps para ingreso
-            if (r.ubicacionIngreso) {
-                const urlMaps = `https://www.google.com/maps?q=${r.ubicacionIngreso.lat},${r.ubicacionIngreso.lon}`;
-                doc.fillColor("blue").text("Ver ubicación de ingreso en Maps", { link: urlMaps, underline: true });
-                doc.fillColor("black");
-            }
+      doc.moveDown();
+      doc.text(`DNI: ${r.dni} | Nombre: ${r.nombre}`);
+      doc.text(`Ingreso: ${ingresoDate ? ingresoDate.toLocaleString("es-AR", opcionesHora) : "No registrado"}`);
+      doc.text(`Salida: ${salidaDate ? salidaDate.toLocaleString("es-AR", opcionesHora) : "Pendiente"}`);
+      doc.text(`Horas trabajadas: ${tiempoTrabajado}`);
+      doc.text(`IP: ${r.ip}`);
+      doc.text(`Ubicación de ingreso: ${r.ubicacionIngreso ? `Lat: ${r.ubicacionIngreso.lat}, Lng: ${r.ubicacionIngreso.lng}` : "No disponible"}`);
 
-            // Enlace a Maps para salida
-            if (r.ubicacionSalida) {
-                const urlMaps = `https://www.google.com/maps?q=${r.ubicacionSalida.lat},${r.ubicacionSalida.lon}`;
-                doc.fillColor("blue").text("Ver ubicación de salida en Maps", { link: urlMaps, underline: true });
-                doc.fillColor("black");
-            }
-        });
-
-        doc.end();
-
-        stream.on("finish", () => resolve(filePath));
-        stream.on("error", reject);
+      // Enlace a Maps si tiene ubicación
+      if (r.ubicacionIngreso && r.ubicacionIngreso.lat && r.ubicacionIngreso.lng) {
+        const urlMaps = `https://www.google.com/maps?q=${r.ubicacionIngreso.lat},${r.ubicacionIngreso.lng}`;
+        doc.fillColor("blue").text("Ver ubicación en Maps", { link: urlMaps, underline: true });
+        doc.fillColor("black");
+      }
     });
+
+    doc.end();
+
+    stream.on("finish", () => resolve(filePath));
+    stream.on("error", reject);
+  });
 }
 
 module.exports = { generarPDF };
-
