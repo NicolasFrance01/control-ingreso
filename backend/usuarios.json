@@ -1,0 +1,5 @@
+[
+    { "dni": "12345678", "nombre": "Juan Pérez", "clave": "1234" },
+    { "dni": "87654321", "nombre": "Ana López", "clave": "abcd" },
+    { "dni": "41847034", "nombre": "Nicolas France", "clave": "12345" }
+]
