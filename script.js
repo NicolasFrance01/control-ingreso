@@ -17,6 +17,11 @@ async function login() {
             document.getElementById("dashboard-container").classList.remove("hidden");
             document.getElementById("status").textContent = `Ingreso correcto: ${new Date(data.registro.ingreso).toLocaleTimeString()}`;
             window.currentRegistro = data.registro;
+
+            // 🔑 Mostrar botón PDF solo si el usuario es admin o 41847034
+            if (dni === "admin" || dni === "41847034") {
+                document.getElementById("btn-pdf").classList.remove("hidden");
+            }
         } else {
             error.textContent = data.msg;
         }
@@ -43,7 +48,7 @@ async function registrarIngreso() {
         window.currentRegistro.ubicacion = { lat: pos.coords.latitude, lon: pos.coords.longitude };
         document.getElementById("status").textContent = "Ingreso registrado ✅";
 
-        await fetch(`${backendURL}/login`, { // opcional: guardar ingreso con ubicación
+        await fetch(`${backendURL}/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(window.currentRegistro)
@@ -51,17 +56,7 @@ async function registrarIngreso() {
     }, () => {
         document.getElementById("status").textContent = "Ingreso registrado sin ubicación ❌";
     });
-    
-    if (user === USER && pass === PASS) {
-    document.getElementById("login-container").classList.add("hidden");
-    document.getElementById("dashboard-container").classList.remove("hidden");
-
-    // Verificamos si el usuario tiene permiso para ver el botón PDF
-    if (user === "admin" || user === "41847034") {
-        document.getElementById("btn-pdf").classList.remove("hidden");
-    }
 }
-
 
 async function registrarSalida() {
     if (!window.currentRegistro) return;
@@ -87,15 +82,15 @@ async function registrarSalida() {
     });
 }
 
+// 📄 Descargar PDF
 document.getElementById("btn-pdf").addEventListener("click", async () => {
-    const hoy = new Date().toISOString().split("T")[0]; // fecha de hoy en formato YYYY-MM-DD
+    const hoy = new Date().toISOString().split("T")[0];
     const url = `${backendURL}/pdf?fecha=${hoy}`;
 
     try {
         const res = await fetch(url);
         if (!res.ok) throw new Error("No se pudo generar el PDF");
 
-        // Convertimos respuesta en blob (archivo)
         const blob = await res.blob();
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
@@ -105,4 +100,3 @@ document.getElementById("btn-pdf").addEventListener("click", async () => {
         alert("Error descargando PDF: " + err.message);
     }
 });
-
