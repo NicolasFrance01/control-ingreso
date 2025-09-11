@@ -52,33 +52,27 @@ app.post("/login", (req, res) => {
     res.json({ ok: true, msg: "Ingreso correcto", registro });
 });
 
-// registrar salida
 app.post("/salida", (req, res) => {
     const { dni } = req.body;
 
-    if (!dni) {
-        return res.status(400).json({ ok: false, msg: "Falta DNI" });
-    }
-
     const hoy = new Date().toISOString().split("T")[0];
     const archivo = path.join(STORAGE_PATH, `registros_${hoy}.json`);
-
     if (!fs.existsSync(archivo)) {
-        return res.status(404).json({ ok: false, msg: "No hay registros del día" });
+        return res.status(404).json({ ok: false, msg: "No hay registros de hoy" });
     }
 
-    let data = JSON.parse(fs.readFileSync(archivo));
+    const data = JSON.parse(fs.readFileSync(archivo));
     const registro = data.find(r => r.dni === dni);
-
     if (!registro) {
-        return res.status(404).json({ ok: false, msg: "No se encontró registro de ingreso" });
+        return res.status(404).json({ ok: false, msg: "No se encontró el ingreso del usuario" });
     }
 
-    registro.salida = new Date().toISOString(); // agregamos hora de salida
+    registro.salida = new Date().toISOString(); // agregamos salida
     fs.writeFileSync(archivo, JSON.stringify(data, null, 2));
 
-    res.json({ ok: true, msg: "Salida registrada ✅", registro });
+    res.json({ ok: true, msg: "Salida registrada", registro });
 });
+
 
 
 
@@ -104,6 +98,7 @@ app.get("/generar-pdf", async (req, res) => {
 app.listen(PORT, () => {
     console.log(`Backend corriendo en http://localhost:${PORT}`);
 });
+
 
 
 
