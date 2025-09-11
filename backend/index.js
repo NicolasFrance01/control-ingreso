@@ -27,7 +27,9 @@ app.post("/login", (req, res) => {
         dni,
         nombre: user.nombre,
         ingreso: new Date().toISOString(),
-        ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress
+        ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress,
+        lat: ubicacionIngreso ? ubicacionIngreso.lat : null,
+        lng: ubicacionIngreso ? ubicacionIngreso.lng : null
     };
 
     // crear carpeta STORAGE_PATH si no existe
@@ -81,5 +83,6 @@ app.get("/pdf", async (req, res) => {
 app.listen(PORT, () => {
     console.log(`Backend corriendo en http://localhost:${PORT}`);
 });
+
 
 
