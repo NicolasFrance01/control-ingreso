@@ -39,6 +39,9 @@ function generarPDF(registros, fecha) {
             doc.text(`Salida: ${salida ? salida.toLocaleString("es-AR") : "Pendiente"}`);
             doc.text(`Horas trabajadas: ${tiempoTrabajado}`);
             doc.text(`IP: ${r.ip}`);
+            doc.text(`Salida: ${registro.salida ? registro.salida : "Pendiente"}`);
+            doc.text(`Horas trabajadas: ${registro.horasTrabajadas ? registro.horasTrabajadas : "Pendiente"}`);
+
 
             // Enlace a Maps si tiene ubicación guardada
             if (r.lat && r.lng) {
@@ -56,3 +59,4 @@ function generarPDF(registros, fecha) {
 }
 
 module.exports = { generarPDF };
+
