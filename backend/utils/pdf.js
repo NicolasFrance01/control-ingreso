@@ -20,9 +20,17 @@ function generarPDF(registros, fecha) {
         doc.moveDown();
 
         registros.forEach(r => {
-            const ingreso = r.ingreso ? new Date(r.ingreso) : null;
-            const salida = r.salida ? new Date(r.salida) : null;
+            //const ingreso = r.ingreso ? new Date(r.ingreso) : null;
+            //const salida = r.salida ? new Date(r.salida) : null;
+            const opcionesHora = { timeZone: "America/Argentina/Buenos_Aires", hour12: false };
 
+            const ingreso = r.ingreso ? new Date(r.ingreso).toLocaleString("es-AR", opcionesHora) : "No registrado";
+            const salida = r.salida ? new Date(r.salida).toLocaleString("es-AR", opcionesHora) : "Pendiente";
+            
+            doc.text(`Ingreso: ${ingreso}`);
+            doc.text(`Salida: ${salida}`);
+            doc.text(`Ubicación de ingreso: ${r.ubicacionIngreso ? `Lat: ${r.ubicacionIngreso.lat}, Lng: ${r.ubicacionIngreso.lng}` : "No disponible"}`);
+            
             let tiempoTrabajado = "Pendiente";
             if (ingreso && salida) {
                 const diffMs = salida - ingreso;
@@ -62,3 +70,4 @@ function generarPDF(registros, fecha) {
 }
 
 module.exports = { generarPDF };
+
