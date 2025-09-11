@@ -26,27 +26,32 @@ app.post("/login", (req, res) => {
     return res.status(401).json({ ok: false, msg: "DNI o clave incorrectos" });
   }
 
+  const ahora = new Date();
+
   const registro = {
     dni,
     nombre: user.nombre,
-    ingreso: new Date().toISOString(),
+    //ingreso: new Date().toISOString(),
+    ingreso: ahora.toISOString(),
     ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress,
-    lat,
-    lng
+    ubicacionIngreso: lat && lng ? { lat, lng } : null // guardamos ubicación
+    //lat,
+    //lng
   };
 
+  // crear carpeta STORAGE_PATH si no existe
   if (!fs.existsSync(STORAGE_PATH)) {
     fs.mkdirSync(STORAGE_PATH, { recursive: true });
   }
 
-  const hoy = new Date().toISOString().split("T")[0];
+  const hoy = ahora.toISOString().split("T")[0];
+  //const hoy = new Date().toISOString().split("T")[0];
   const archivo = path.join(STORAGE_PATH, `registros_${hoy}.json`);
 
   let data = [];
   if (fs.existsSync(archivo)) {
     data = JSON.parse(fs.readFileSync(archivo));
-  }
-
+  //}
   data.push(registro);
   fs.writeFileSync(archivo, JSON.stringify(data, null, 2));
 
@@ -100,3 +105,4 @@ app.get("/generar-pdf", (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`Backend corriendo en http://localhost:${PORT}`));
+
