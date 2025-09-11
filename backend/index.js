@@ -18,7 +18,7 @@ const usuarios = JSON.parse(fs.readFileSync("usuarios.json", "utf8"));
 
 // login
 app.post("/login", (req, res) => {
-    const { dni, clave } = req.body;
+    const { dni, clave, ubicacionIngreso } = req.body;  // 👈 acá se captura ubicacionIngreso
     const user = usuarios.find(u => u.dni === dni && u.clave === clave);
 
     if (!user) return res.status(401).json({ ok: false, msg: "DNI o clave incorrectos" });
@@ -32,7 +32,6 @@ app.post("/login", (req, res) => {
         lng: ubicacionIngreso ? ubicacionIngreso.lng : null
     };
 
-    // crear carpeta STORAGE_PATH si no existe
     if (!fs.existsSync(STORAGE_PATH)) fs.mkdirSync(STORAGE_PATH, { recursive: true });
 
     const hoy = new Date().toISOString().split("T")[0];
@@ -44,6 +43,7 @@ app.post("/login", (req, res) => {
 
     res.json({ ok: true, msg: "Ingreso correcto", registro });
 });
+
 
 // registrar salida
 app.post("/salida", (req, res) => {
@@ -83,6 +83,7 @@ app.get("/pdf", async (req, res) => {
 app.listen(PORT, () => {
     console.log(`Backend corriendo en http://localhost:${PORT}`);
 });
+
 
 
 
