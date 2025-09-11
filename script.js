@@ -51,7 +51,17 @@ async function registrarIngreso() {
     }, () => {
         document.getElementById("status").textContent = "Ingreso registrado sin ubicación ❌";
     });
+    
+    if (user === USER && pass === PASS) {
+    document.getElementById("login-container").classList.add("hidden");
+    document.getElementById("dashboard-container").classList.remove("hidden");
+
+    // Verificamos si el usuario tiene permiso para ver el botón PDF
+    if (user === "admin" || user === "41847034") {
+        document.getElementById("btn-pdf").classList.remove("hidden");
+    }
 }
+
 
 async function registrarSalida() {
     if (!window.currentRegistro) return;
@@ -76,3 +86,4 @@ async function registrarSalida() {
         document.getElementById("status").textContent = "Salida registrada sin ubicación ❌";
     });
 }
+
