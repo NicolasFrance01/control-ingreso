@@ -40,11 +40,12 @@ function generarPDF(registros, fecha) {
             doc.text(`IP: ${r.ip}`);
 
             // Enlace a Maps para ingreso
-            if (r.ubicacionIngreso) {
-                const urlMaps = `https://www.google.com/maps?q=${r.ubicacionIngreso.lat},${r.ubicacionIngreso.lon}`;
+            if (r.lat && r.lng) {
+                const urlMaps = `https://www.google.com/maps?q=${r.lat},${r.lng}`;
                 doc.fillColor("blue").text("Ver ubicación de ingreso en Maps", { link: urlMaps, underline: true });
                 doc.fillColor("black");
             }
+
 
             // Enlace a Maps para salida
             if (r.ubicacionSalida) {
@@ -62,3 +63,4 @@ function generarPDF(registros, fecha) {
 }
 
 module.exports = { generarPDF };
+
