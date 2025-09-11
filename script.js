@@ -48,7 +48,33 @@ function logout() {
 
 async function registrarIngreso() {
     if (!window.currentRegistro) return;
-    document.getElementById("status").textContent = "Ingreso registrado ✅";
+
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+        const ubicacionIngreso = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+
+        // Guardamos ubicación en el backend
+        const res = await fetch(`${backendURL}/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                dni: window.currentRegistro.dni,
+                clave: window.currentRegistro.clave, // si querés mandar la clave de nuevo
+                ubicacionIngreso
+            })
+        });
+
+        const data = await res.json();
+
+        if (data.ok) {
+            document.getElementById("status").textContent = "Ingreso registrado ✅";
+            window.currentRegistro = data.registro; // guardamos también la ubicación
+        } else {
+            document.getElementById("status").textContent = data.msg;
+        }
+
+    }, () => {
+        document.getElementById("status").textContent = "Ingreso registrado sin ubicación ❌";
+    });
 }
 
 async function registrarSalida() {
@@ -79,4 +105,5 @@ function descargarPDF() {
     const hoy = new Date().toISOString().split("T")[0];
     window.open(`${backendURL}/pdf?fecha=${hoy}`, "_blank");
 }
+
 
