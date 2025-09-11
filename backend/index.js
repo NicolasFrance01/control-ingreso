@@ -52,6 +52,24 @@ app.post("/login", (req, res) => {
     res.json({ ok: true, msg: "Ingreso correcto", registro });
 });
 
+// registrar salida
+app.post("/salida", (req, res) => {
+    const { dni } = req.body;
+    const hoy = new Date().toISOString().split("T")[0];
+    const archivo = path.join(STORAGE_PATH, `registros_${hoy}.json`);
+    if (!fs.existsSync(archivo)) return res.json({ ok: false, msg: "No hay registros" });
+
+    const data = JSON.parse(fs.readFileSync(archivo));
+    const user = data.find(u => u.dni === dni);
+    if (!user) return res.json({ ok: false, msg: "Usuario no encontrado" });
+
+    user.salida = new Date().toISOString();
+    fs.writeFileSync(archivo, JSON.stringify(data, null, 2));
+
+    res.json({ ok: true, registro: user });
+});
+
+
 // generar pdf del día
 app.get("/generar-pdf", async (req, res) => {
     try {
@@ -74,3 +92,4 @@ app.get("/generar-pdf", async (req, res) => {
 app.listen(PORT, () => {
     console.log(`Backend corriendo en http://localhost:${PORT}`);
 });
+
