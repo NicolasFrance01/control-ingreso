@@ -62,7 +62,7 @@ app.post("/salida", (req, res) => {
 });
 
 // generar pdf del día
-app.get("/generar-pdf", async (req, res) => {
+app.get("/pdf", async (req, res) => {
     try {
         const fecha = req.query.fecha;
         const archivo = path.join(STORAGE_PATH, `registros_${fecha}.json`);
@@ -81,4 +81,5 @@ app.get("/generar-pdf", async (req, res) => {
 app.listen(PORT, () => {
     console.log(`Backend corriendo en http://localhost:${PORT}`);
 });
+
 
