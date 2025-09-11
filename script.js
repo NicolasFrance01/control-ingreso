@@ -21,7 +21,7 @@ async function login() {
             // Mostrar mensaje con horario de ingreso
             document.getElementById("status").textContent = `Ingreso correcto: ${new Date(data.registro.ingreso).toLocaleTimeString()}`;
 
-            // Guardamos info del registro si necesitás para registrar salida o captura
+            // Guardamos info del registro para registrar salida
             window.currentRegistro = data.registro;
         } else {
             error.textContent = data.msg;
@@ -39,16 +39,35 @@ function logout() {
     document.getElementById("password").value = "";
     document.getElementById("error").textContent = "";
     document.getElementById("status").textContent = "";
+    window.currentRegistro = null;
 }
 
 async function registrarIngreso() {
     if (!window.currentRegistro) return;
+
     document.getElementById("status").textContent = "Ingreso registrado ✅";
-    // Aquí podrías hacer fetch a un endpoint de registro de ingreso si quieres guardar algo extra
+
+    // Opcional: enviar un fetch al backend si querés guardar algo extra
 }
 
 async function registrarSalida() {
     if (!window.currentRegistro) return;
-    document.getElementById("status").textContent = "Salida registrada ✅";
-    // Aquí podrías hacer fetch a un endpoint de salida para guardar la hora final
+
+    try {
+        const res = await fetch(`${backendURL}/salida`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ dni: window.currentRegistro.dni })
+        });
+
+        const data = await res.json();
+        if (data.ok) {
+            document.getElementById("status").textContent = `Salida registrada: ${new Date(data.registro.salida).toLocaleTimeString()}`;
+        } else {
+            document.getElementById("status").textContent = "Error registrando salida";
+        }
+    } catch (err) {
+        console.error(err);
+        document.getElementById("status").textContent = "Error conectando con el servidor";
+    }
 }
