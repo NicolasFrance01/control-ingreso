@@ -1,108 +1,86 @@
-const backendURL = "https://control-ingreso.onrender.com"; // URL de tu backend en Render
+const backendURL = "https://control-ingreso.onrender.com";
 
+// LOGIN
 async function login() {
-    const dni = document.getElementById("username").value;
-    const clave = document.getElementById("password").value;
-    const error = document.getElementById("error");
+  const dni = document.getElementById("username").value;
+  const clave = document.getElementById("password").value;
+  const error = document.getElementById("error");
 
-    try {
-        const res = await fetch(`${backendURL}/login`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ dni, clave })
-        });
-        const data = await res.json();
+  try {
+    // primero pedimos ubicación
+    navigator.geolocation.getCurrentPosition(async pos => {
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
 
-        if (data.ok) {
-            document.getElementById("login-container").classList.add("hidden");
-            document.getElementById("dashboard-container").classList.remove("hidden");
+      const res = await fetch(`${backendURL}/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ dni, clave, lat, lng })
+      });
 
-            document.getElementById("status").textContent = `Ingreso correcto: ${new Date(data.registro.ingreso).toLocaleTimeString()}`;
+      const data = await res.json();
 
-            // Guardamos info del registro
-            window.currentRegistro = data.registro;
+      if (data.ok) {
+        document.getElementById("login-container").classList.add("hidden");
+        document.getElementById("dashboard-container").classList.remove("hidden");
+        document.getElementById("status").textContent =
+          `Ingreso correcto: ${new Date(data.registro.ingreso).toLocaleTimeString()}`;
 
-            // Solo mostrar botón de PDF si es el usuario con DNI 41847034
-            if (String(data.registro.dni) === "41847034") {
-                document.getElementById("pdf-button").classList.remove("hidden");
-            }
-        } else {
-            error.textContent = data.msg;
+        window.currentRegistro = data.registro;
+
+        // botón para generar PDF SOLO si es el user 41847034
+        if (dni === "41847034") {
+          document.getElementById("pdfBtn").classList.remove("hidden");
         }
-    } catch (err) {
-        console.error(err);
-        error.textContent = "Error conectando con el servidor";
-    }
+      } else {
+        error.textContent = data.msg;
+      }
+    }, () => {
+      error.textContent = "Debes permitir la ubicación para ingresar.";
+    });
+  } catch (err) {
+    console.error(err);
+    error.textContent = "Error conectando con el servidor";
+  }
 }
 
+// LOGOUT
 function logout() {
-    document.getElementById("dashboard-container").classList.add("hidden");
-    document.getElementById("login-container").classList.remove("hidden");
-    document.getElementById("username").value = "";
-    document.getElementById("password").value = "";
-    document.getElementById("error").textContent = "";
-    document.getElementById("status").textContent = "";
-    window.currentRegistro = null;
-    document.getElementById("pdf-button").classList.add("hidden");
+  document.getElementById("dashboard-container").classList.add("hidden");
+  document.getElementById("login-container").classList.remove("hidden");
+  document.getElementById("username").value = "";
+  document.getElementById("password").value = "";
+  document.getElementById("error").textContent = "";
+  document.getElementById("status").textContent = "";
+  window.currentRegistro = null;
+  document.getElementById("pdfBtn").classList.add("hidden");
 }
 
-async function registrarIngreso() {
-    if (!window.currentRegistro) return;
-
-    navigator.geolocation.getCurrentPosition(async (pos) => {
-        const ubicacionIngreso = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-
-        // Guardamos ubicación en el backend
-        const res = await fetch(`${backendURL}/login`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                dni: window.currentRegistro.dni,
-                clave: window.currentRegistro.clave, // si querés mandar la clave de nuevo
-                ubicacionIngreso
-            })
-        });
-
-        const data = await res.json();
-
-        if (data.ok) {
-            document.getElementById("status").textContent = "Ingreso registrado ✅";
-            window.currentRegistro = data.registro; // guardamos también la ubicación
-        } else {
-            document.getElementById("status").textContent = data.msg;
-        }
-
-    }, () => {
-        document.getElementById("status").textContent = "Ingreso registrado sin ubicación ❌";
-    });
-}
-
+// REGISTRAR SALIDA
 async function registrarSalida() {
-    if (!window.currentRegistro) return;
-
-    navigator.geolocation.getCurrentPosition(async (pos) => {
-        const ubicacionSalida = { lat: pos.coords.latitude, lon: pos.coords.longitude };
-
-        const res = await fetch(`${backendURL}/salida`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ dni: window.currentRegistro.dni, ubicacionSalida })
-        });
-        const data = await res.json();
-        if (data.ok) {
-            document.getElementById("status").textContent = `Salida registrada: ${new Date(data.registro.salida).toLocaleTimeString()}`;
-            window.currentRegistro = null;
-        } else {
-            document.getElementById("status").textContent = data.msg;
-        }
-    }, () => {
-        document.getElementById("status").textContent = "Salida registrada sin ubicación ❌";
+  if (!window.currentRegistro) return;
+  try {
+    const res = await fetch(`${backendURL}/salida`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ dni: window.currentRegistro.dni })
     });
+
+    const data = await res.json();
+
+    if (data.ok) {
+      document.getElementById("status").textContent =
+        `Salida registrada: ${new Date(data.registro.salida).toLocaleTimeString()}`;
+    } else {
+      document.getElementById("status").textContent = data.msg;
+    }
+  } catch (err) {
+    console.error(err);
+    document.getElementById("status").textContent = "Error conectando con el servidor";
+  }
 }
 
-// Descargar PDF
+// DESCARGAR PDF
 function descargarPDF() {
-    const hoy = new Date().toISOString().split("T")[0];
-    window.open(`${backendURL}/pdf?fecha=${hoy}`, "_blank");
+  window.open(`${backendURL}/generar-pdf`, "_blank");
 }
-
