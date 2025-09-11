@@ -87,3 +87,22 @@ async function registrarSalida() {
     });
 }
 
+document.getElementById("btn-pdf").addEventListener("click", async () => {
+    const hoy = new Date().toISOString().split("T")[0]; // fecha de hoy en formato YYYY-MM-DD
+    const url = `${backendURL}/pdf?fecha=${hoy}`;
+
+    try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("No se pudo generar el PDF");
+
+        // Convertimos respuesta en blob (archivo)
+        const blob = await res.blob();
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `reporte_${hoy}.pdf`;
+        link.click();
+    } catch (err) {
+        alert("Error descargando PDF: " + err.message);
+    }
+});
+
