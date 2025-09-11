@@ -1,4 +1,4 @@
-const backendURL = "https://control-ingreso.onrender.com";
+const backendURL = "https://control-ingreso.onrender.com"; // URL de tu backend en Render
 
 async function login() {
     const dni = document.getElementById("username").value;
@@ -12,18 +12,19 @@ async function login() {
             body: JSON.stringify({ dni, clave })
         });
         const data = await res.json();
+
         if (data.ok) {
             document.getElementById("login-container").classList.add("hidden");
             document.getElementById("dashboard-container").classList.remove("hidden");
-            document.getElementById("status").textContent =
-                `Ingreso correcto: ${new Date(data.registro.ingreso).toLocaleTimeString()}`;
+
+            document.getElementById("status").textContent = `Ingreso correcto: ${new Date(data.registro.ingreso).toLocaleTimeString()}`;
+
+            // Guardamos info del registro
             window.currentRegistro = data.registro;
 
-            // 👇 Solo mostramos el botón PDF si el DNI es 41847034
-            if (dni === "41847034") {
-                document.getElementById("btn-pdf").classList.remove("hidden");
-            } else {
-                document.getElementById("btn-pdf").classList.add("hidden");
+            // Solo mostrar botón de PDF si es el usuario con DNI 41847034
+            if (data.registro.dni === "41847034") {
+                document.getElementById("pdf-button").classList.remove("hidden");
             }
         } else {
             error.textContent = data.msg;
@@ -42,24 +43,12 @@ function logout() {
     document.getElementById("error").textContent = "";
     document.getElementById("status").textContent = "";
     window.currentRegistro = null;
-    document.getElementById("btn-pdf").classList.add("hidden"); // ocultar siempre al salir
+    document.getElementById("pdf-button").classList.add("hidden");
 }
 
 async function registrarIngreso() {
     if (!window.currentRegistro) return;
-
-    navigator.geolocation.getCurrentPosition(async (pos) => {
-        window.currentRegistro.ubicacion = { lat: pos.coords.latitude, lon: pos.coords.longitude };
-        document.getElementById("status").textContent = "Ingreso registrado ✅";
-
-        await fetch(`${backendURL}/login`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(window.currentRegistro)
-        });
-    }, () => {
-        document.getElementById("status").textContent = "Ingreso registrado sin ubicación ❌";
-    });
+    document.getElementById("status").textContent = "Ingreso registrado ✅";
 }
 
 async function registrarSalida() {
@@ -74,7 +63,6 @@ async function registrarSalida() {
             body: JSON.stringify({ dni: window.currentRegistro.dni, ubicacionSalida })
         });
         const data = await res.json();
-
         if (data.ok) {
             document.getElementById("status").textContent = `Salida registrada: ${new Date(data.registro.salida).toLocaleTimeString()}`;
             window.currentRegistro = null;
@@ -86,22 +74,8 @@ async function registrarSalida() {
     });
 }
 
-// 📄 Descargar PDF
-document.getElementById("btn-pdf").addEventListener("click", async () => {
+// Descargar PDF
+function descargarPDF() {
     const hoy = new Date().toISOString().split("T")[0];
-    const url = `${backendURL}/pdf?fecha=${hoy}`;
-
-    try {
-        const res = await fetch(url);
-        if (!res.ok) throw new Error("No se pudo generar el PDF");
-
-        const blob = await res.blob();
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = `reporte_${hoy}.pdf`;
-        link.click();
-    } catch (err) {
-        alert("Error descargando PDF: " + err.message);
-    }
-});
-
+    window.open(`${backendURL}/pdf?fecha=${hoy}`, "_blank");
+}
