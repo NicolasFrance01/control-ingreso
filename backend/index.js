@@ -8,7 +8,7 @@ const { generarPDF } = require("./utils/pdf");
 const app = express();
 const PORT = process.env.PORT || 3000;
 const STORAGE_PATH = process.env.STORAGE_PATH || "./data";
-const FRONTEND_URL = process.env.FRONTEND_URL || "*";
+const FRONTEND_URL = process.env.FRONTEND_URL || "https://nicolasfrance01.github.io";
 
 app.use(cors({ origin: FRONTEND_URL }));
 app.use(bodyParser.json());
@@ -92,4 +92,5 @@ app.get("/generar-pdf", async (req, res) => {
 app.listen(PORT, () => {
     console.log(`Backend corriendo en http://localhost:${PORT}`);
 });
+
 
