@@ -15,12 +15,15 @@ async function login() {
         if (data.ok) {
             document.getElementById("login-container").classList.add("hidden");
             document.getElementById("dashboard-container").classList.remove("hidden");
-            document.getElementById("status").textContent = `Ingreso correcto: ${new Date(data.registro.ingreso).toLocaleTimeString()}`;
+            document.getElementById("status").textContent =
+                `Ingreso correcto: ${new Date(data.registro.ingreso).toLocaleTimeString()}`;
             window.currentRegistro = data.registro;
 
-            // 🔑 Mostrar botón PDF solo si el usuario es admin o 41847034
-            if (dni === "admin" || dni === "41847034") {
+            // 👇 Solo mostramos el botón PDF si el DNI es 41847034
+            if (dni === "41847034") {
                 document.getElementById("btn-pdf").classList.remove("hidden");
+            } else {
+                document.getElementById("btn-pdf").classList.add("hidden");
             }
         } else {
             error.textContent = data.msg;
@@ -39,6 +42,7 @@ function logout() {
     document.getElementById("error").textContent = "";
     document.getElementById("status").textContent = "";
     window.currentRegistro = null;
+    document.getElementById("btn-pdf").classList.add("hidden"); // ocultar siempre al salir
 }
 
 async function registrarIngreso() {
@@ -100,3 +104,4 @@ document.getElementById("btn-pdf").addEventListener("click", async () => {
         alert("Error descargando PDF: " + err.message);
     }
 });
+
