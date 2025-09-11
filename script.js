@@ -6,34 +6,37 @@ async function login() {
     const error = document.getElementById("error");
 
     try {
-        const res = await fetch(`${backendURL}/login`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ dni, clave })
-        });
-        const data = await res.json();
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+            const ubicacionIngreso = { lat: pos.coords.latitude, lng: pos.coords.longitude };
 
-        if (data.ok) {
-            document.getElementById("login-container").classList.add("hidden");
-            document.getElementById("dashboard-container").classList.remove("hidden");
+            const res = await fetch(`${backendURL}/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ dni, clave, ubicacionIngreso })
+            });
 
-            document.getElementById("status").textContent = `Ingreso correcto: ${new Date(data.registro.ingreso).toLocaleTimeString()}`;
+            const data = await res.json();
 
-            // Guardamos info del registro
-            window.currentRegistro = data.registro;
+            if (data.ok) {
+                document.getElementById("login-container").classList.add("hidden");
+                document.getElementById("dashboard-container").classList.remove("hidden");
 
-            // Solo mostrar botón de PDF si es el usuario con DNI 41847034
-            if (String(data.registro.dni) === "41847034") {
-                document.getElementById("pdf-button").classList.remove("hidden");
+                document.getElementById("status").textContent =
+                    `Ingreso correcto: ${new Date(data.registro.ingreso).toLocaleTimeString()}`;
+
+                window.currentRegistro = data.registro;
+            } else {
+                error.textContent = data.msg;
             }
-        } else {
-            error.textContent = data.msg;
-        }
+        }, () => {
+            error.textContent = "No se pudo obtener la ubicación";
+        });
     } catch (err) {
         console.error(err);
         error.textContent = "Error conectando con el servidor";
     }
 }
+
 
 function logout() {
     document.getElementById("dashboard-container").classList.add("hidden");
@@ -105,5 +108,6 @@ function descargarPDF() {
     const hoy = new Date().toISOString().split("T")[0];
     window.open(`${backendURL}/pdf?fecha=${hoy}`, "_blank");
 }
+
 
 
