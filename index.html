@@ -5,33 +5,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Control de Ingreso</title>
     <link rel="stylesheet" href="style.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
 <body>
-    <div class="container" id="login-container">
-        <h1>Ingreso al Sistema</h1>
-        <input type="text" id="username" placeholder="Usuario">
-        <input type="password" id="password" placeholder="Contraseña">
-        <button onclick="login()">Ingresar</button>
-        <p id="error" class="error"></p>
-    </div>
+    <div class="container">
 
-    <div class="container hidden" id="dashboard-container">
+        <!-- PANEL LOGIN -->
+        <div class="form-box login">
+        <form onsubmit="event.preventDefault(); login();">
+            <h1>Ingreso al Sistema</h1>
+
+            <div class="input-box">
+            <input type="text" id="username" placeholder="Usuario" required>
+            <i class='bx bxs-user'></i>
+            </div>
+
+            <div class="input-box">
+            <input type="password" id="password" placeholder="Contraseña" required>
+            <i class='bx bxs-lock-alt'></i>
+            </div>
+
+            <button type="submit" class="btn">Ingresar</button>
+            <p id="error" class="error"></p>
+        </form>
+        </div>
+
+        <!-- PANEL DASHBOARD -->
+        <div class="form-box dashboard">
         <h1>Panel de Control</h1>
         <button onclick="registrarIngreso()">Registrar Ingreso</button>
         <button onclick="registrarSalida()">Registrar Salida</button>
         <p id="status"></p>
         <button onclick="logout()">Cerrar Sesión</button>
-        
-        <button id="pdfBtn" class="hidden" onclick="descargarPDF()">📄 Generar PDF</button>
+        <button id="pdfBtn" class="hidden">📄 Generar PDF</button>
+        </div>
+
+        <!-- PANEL ANIMACION TOGGLE -->
+        <!-- LOGO -->
+        <div class="logo">
+        <img src="png-clipart-logo-company-business-creative-company-logo-free-logo-design-template-company-thumbnail-removebg-preview.png" alt="Logo Empresa">
+        </div>
+        <div class="toggle-box">
+        <div class="toggle-panel toggle-left">
+            <h1>Bienvenido!</h1>
+            <p>Ingrese sus credenciales para continuar</p>
+        </div>
+        <div class="toggle-panel toggle-right">
+            <h1>Dashboard</h1>
+            <p>Administración del sistema</p>
+        </div>
+        </div>
+
 
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
-
-
-
-
-
