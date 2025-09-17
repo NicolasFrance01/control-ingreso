@@ -21,8 +21,16 @@ async function login() {
       const data = await res.json();
 
       if (data.ok) {
-        document.getElementById("login-container").classList.add("hidden");
-        document.getElementById("dashboard-container").classList.remove("hidden");
+        // Animación: ocultar login y mostrar dashboard
+        const loginBox = document.getElementById("login-container");
+        const dashboardBox = document.getElementById("dashboard-container");
+
+        loginBox.classList.add("hidden");
+        setTimeout(() => {
+          loginBox.style.display = "none";
+          dashboardBox.style.display = "flex";
+          setTimeout(() => dashboardBox.classList.remove("hidden"), 50);
+        }, 300);
 
         // Mensaje de ingreso ✅
         document.getElementById("status").textContent =
@@ -49,8 +57,16 @@ async function login() {
 
 // LOGOUT
 function logout() {
-  document.getElementById("dashboard-container").classList.add("hidden");
-  document.getElementById("login-container").classList.remove("hidden");
+  const loginBox = document.getElementById("login-container");
+  const dashboardBox = document.getElementById("dashboard-container");
+
+  dashboardBox.classList.add("hidden");
+  setTimeout(() => {
+    dashboardBox.style.display = "none";
+    loginBox.style.display = "flex";
+    setTimeout(() => loginBox.classList.remove("hidden"), 50);
+  }, 300);
+
   document.getElementById("username").value = "";
   document.getElementById("password").value = "";
   document.getElementById("error").textContent = "";
@@ -59,7 +75,7 @@ function logout() {
   document.getElementById("pdfBtn").classList.add("hidden");
 }
 
-// REGISTRAR INGRESO manual (si querés permitirlo con botón extra)
+// REGISTRAR INGRESO manual
 async function registrarIngreso() {
   if (!window.currentRegistro) return;
   document.getElementById("status").textContent =
