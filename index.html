@@ -7,30 +7,43 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container" id="login-container">
-        <h1>Ingreso al Sistema</h1>
-        <input type="text" id="username" placeholder="Usuario">
-        <input type="password" id="password" placeholder="Contraseña">
-        <button onclick="login()">Ingresar</button>
-        <p id="error" class="error"></p>
-    </div>
+    <div class="container">
 
-    <div class="container hidden" id="dashboard-container">
-        <h1>Panel de Control</h1>
-        <button onclick="registrarIngreso()">Registrar Ingreso</button>
-        <button onclick="registrarSalida()">Registrar Salida</button>
-        <p id="status"></p>
-        <button onclick="logout()">Cerrar Sesión</button>
-        
-        <button id="pdfBtn" class="hidden" onclick="descargarPDF()">📄 Generar PDF</button>
+        <!-- LOGIN -->
+        <div class="form-box login">
+            <h1>Ingreso al Sistema</h1>
+            <input type="text" id="username" placeholder="Usuario">
+            <input type="password" id="password" placeholder="Contraseña">
+            <button onclick="login()">Ingresar</button>
+            <p id="error" class="error"></p>
+        </div>
+
+        <!-- DASHBOARD -->
+        <div class="form-box dashboard hidden">
+            <h1>Panel de Control</h1>
+            <button onclick="registrarIngreso()">Registrar Ingreso</button>
+            <button onclick="registrarSalida()">Registrar Salida</button>
+            <p id="status"></p>
+            <button onclick="logout()">Cerrar Sesión</button>
+            <button id="pdfBtn" class="hidden" onclick="descargarPDF()">📄 Generar PDF</button>
+        </div>
+
+        <!-- PANEL DE ANIMACION -->
+        <div class="toggle-box">
+            <div class="toggle-panel toggle-left">
+                <h1>¡Bienvenido!</h1>
+                <p>Ingrese con su usuario</p>
+            </div>
+            <div class="toggle-panel toggle-right">
+                <h1>Dashboard</h1>
+                <p>Panel de control activo</p>
+            </div>
+        </div>
 
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="script.js"></script>
+    <script src="main.js"></script>
 </body>
 </html>
-
-
-
-
