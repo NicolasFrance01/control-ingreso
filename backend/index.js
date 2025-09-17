@@ -16,7 +16,7 @@ app.use(bodyParser.json());
 // cargar usuarios (simulación sin BD)
 const usuarios = JSON.parse(fs.readFileSync("usuarios.json", "utf8"));
 
-// login (registro de ingreso)
+// LOGIN (registro de ingreso)
 app.post("/login", (req, res) => {
   const { dni, clave, lat, lng } = req.body;
   console.log("DNI recibido:", dni, "Clave recibida:", clave);
@@ -31,12 +31,9 @@ app.post("/login", (req, res) => {
   const registro = {
     dni,
     nombre: user.nombre,
-    //ingreso: new Date().toISOString(),
     ingreso: ahora.toISOString(),
     ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress,
-    ubicacionIngreso: lat && lng ? { lat, lng } : null // guardamos ubicación
-    //lat,
-    //lng
+    ubicacionIngreso: lat && lng ? { lat, lng } : null
   };
 
   // crear carpeta STORAGE_PATH si no existe
@@ -45,20 +42,20 @@ app.post("/login", (req, res) => {
   }
 
   const hoy = ahora.toISOString().split("T")[0];
-  //const hoy = new Date().toISOString().split("T")[0];
   const archivo = path.join(STORAGE_PATH, `registros_${hoy}.json`);
 
   let data = [];
   if (fs.existsSync(archivo)) {
     data = JSON.parse(fs.readFileSync(archivo));
-  //}
+  }
+
   data.push(registro);
   fs.writeFileSync(archivo, JSON.stringify(data, null, 2));
 
   res.json({ ok: true, msg: "Ingreso correcto", registro });
 });
 
-// salida
+// SALIDA
 app.post("/salida", (req, res) => {
   const { dni } = req.body;
   const hoy = new Date().toISOString().split("T")[0];
@@ -82,7 +79,7 @@ app.post("/salida", (req, res) => {
   res.json({ ok: true, msg: "Salida registrada", registro });
 });
 
-// generar PDF
+// GENERAR PDF
 app.get("/generar-pdf", (req, res) => {
   const hoy = new Date().toISOString().split("T")[0];
   const archivo = path.join(STORAGE_PATH, `registros_${hoy}.json`);
@@ -104,5 +101,4 @@ app.get("/generar-pdf", (req, res) => {
     });
 });
 
-app.listen(PORT, () => console.log(`Backend corriendo en http://localhost:${PORT}`));
-
+app.listen(PORT, () => console.log(`✅ Backend corriendo en http://localhost:${PORT}`));
