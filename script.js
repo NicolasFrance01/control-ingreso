@@ -7,7 +7,7 @@ async function login() {
   const error = document.getElementById("error");
 
   try {
-    // primero pedimos ubicación
+    // pedimos ubicación antes de loguear
     navigator.geolocation.getCurrentPosition(async pos => {
       const lat = pos.coords.latitude;
       const lng = pos.coords.longitude;
@@ -23,12 +23,15 @@ async function login() {
       if (data.ok) {
         document.getElementById("login-container").classList.add("hidden");
         document.getElementById("dashboard-container").classList.remove("hidden");
-        document.getElementById("status").textContent =
-          `Ingreso correcto: ${new Date(data.registro.ingreso).toLocaleTimeString()}`;
 
+        // Mensaje de ingreso ✅
+        document.getElementById("status").textContent =
+          `Ingreso registrado ✅ (${new Date(data.registro.ingreso).toLocaleTimeString()})`;
+
+        // Guardamos info del registro
         window.currentRegistro = data.registro;
 
-        // botón para generar PDF SOLO si es el user 41847034
+        // botón PDF solo para DNI 41847034
         if (dni === "41847034") {
           document.getElementById("pdfBtn").classList.remove("hidden");
         }
@@ -56,6 +59,13 @@ function logout() {
   document.getElementById("pdfBtn").classList.add("hidden");
 }
 
+// REGISTRAR INGRESO manual (si querés permitirlo con botón extra)
+async function registrarIngreso() {
+  if (!window.currentRegistro) return;
+  document.getElementById("status").textContent =
+    `Ingreso registrado ✅ (${new Date().toLocaleTimeString()})`;
+}
+
 // REGISTRAR SALIDA
 async function registrarSalida() {
   if (!window.currentRegistro) return;
@@ -70,13 +80,13 @@ async function registrarSalida() {
 
     if (data.ok) {
       document.getElementById("status").textContent =
-        `Salida registrada: ${new Date(data.registro.salida).toLocaleTimeString()}`;
+        `Salida registrada ✅ (${new Date(data.registro.salida).toLocaleTimeString()})`;
     } else {
-      document.getElementById("status").textContent = data.msg;
+      document.getElementById("status").textContent = "❌ " + data.msg;
     }
   } catch (err) {
     console.error(err);
-    document.getElementById("status").textContent = "Error conectando con el servidor";
+    document.getElementById("status").textContent = "❌ Error conectando con el servidor";
   }
 }
 
@@ -84,5 +94,3 @@ async function registrarSalida() {
 function descargarPDF() {
   window.open(`${backendURL}/generar-pdf`, "_blank");
 }
-
-
