@@ -1,7 +1,8 @@
 [
     { "dni": "12345678", "nombre": "User Test Uno", "clave": "1234" },
     { "dni": "87654321", "nombre": "User Test Dos", "clave": "abcd" },
-    { "dni": "41847034", "nombre": "Nicolas France", "clave": "12345" }
+    { "dni": "41847034", "nombre": "Nicolas France", "clave": "12345" },
     { "dni": "43560234", "nombre": "Samuel Chavero", "clave": "123456" }
 ]
+
 
