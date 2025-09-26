@@ -9,11 +9,6 @@
     list-style: none;
 }
 
-html, body {
-    height: 100%;
-    overflow: hidden; /* evita scroll */
-}
-
 body{
     display: flex;
     justify-content: center;
@@ -285,4 +280,5 @@ form{ width: 100%; }
 #dashboard-container .btn:hover {
     transform: scale(1.05);
 }
+
 
