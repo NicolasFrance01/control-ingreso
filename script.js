@@ -1,5 +1,5 @@
 const backendURL = "https://control-ingreso.onrender.com";
-const container = document.getElementById("main-container");
+const container = document.querySelector('.container');
 
 // LOGIN
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
@@ -24,9 +24,7 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
 
       if (data.ok) {
         error.textContent = "";
-
-        // animación
-        container.classList.add("active");
+        container.classList.add("active"); // animación
 
         setTimeout(() => {
           document.getElementById("login-container").classList.add("hidden");
@@ -37,10 +35,11 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
 
           window.currentRegistro = data.registro;
 
+          // admin (41847034)
           if (dni === "41847034") {
             document.getElementById("pdfBtn").classList.remove("hidden");
           }
-        }, 800);
+        }, 1000);
       } else {
         error.textContent = data.msg;
       }
@@ -60,15 +59,14 @@ function logout() {
   document.getElementById("login-container").classList.remove("hidden");
   document.getElementById("username").value = "";
   document.getElementById("password").value = "";
-  document.getElementById("error").textContent = "";
   document.getElementById("status").textContent = "";
-  window.currentRegistro = null;
+  document.getElementById("error").textContent = "";
   document.getElementById("pdfBtn").classList.add("hidden");
+  window.currentRegistro = null;
 }
 
 // REGISTRAR INGRESO
 function registrarIngreso() {
-  if (!window.currentRegistro) return;
   document.getElementById("status").textContent =
     `Ingreso registrado ✅ (${new Date().toLocaleTimeString()})`;
 }
