@@ -35,7 +35,6 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
 
           window.currentRegistro = data.registro;
 
-          // admin (41847034)
           if (dni === "41847034") {
             document.getElementById("pdfBtn").classList.remove("hidden");
           }
@@ -67,6 +66,7 @@ function logout() {
 
 // REGISTRAR INGRESO
 function registrarIngreso() {
+  if (!window.currentRegistro) return;
   document.getElementById("status").textContent =
     `Ingreso registrado ✅ (${new Date().toLocaleTimeString()})`;
 }
@@ -82,7 +82,6 @@ async function registrarSalida() {
     });
 
     const data = await res.json();
-
     if (data.ok) {
       document.getElementById("status").textContent =
         `Salida registrada ✅ (${new Date(data.registro.salida).toLocaleTimeString()})`;
