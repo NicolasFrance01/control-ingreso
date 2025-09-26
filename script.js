@@ -1,13 +1,15 @@
 const backendURL = "https://control-ingreso.onrender.com";
+const container = document.getElementById("main-container");
 
 // LOGIN
-async function login() {
+document.getElementById("loginForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
   const dni = document.getElementById("username").value;
   const clave = document.getElementById("password").value;
   const error = document.getElementById("error");
 
   try {
-    // pedimos ubicación antes de loguear
     navigator.geolocation.getCurrentPosition(async pos => {
       const lat = pos.coords.latitude;
       const lng = pos.coords.longitude;
@@ -21,20 +23,24 @@ async function login() {
       const data = await res.json();
 
       if (data.ok) {
-        document.getElementById("login-container").classList.add("hidden");
-        document.getElementById("dashboard-container").classList.remove("hidden");
+        error.textContent = "";
 
-        // Mensaje de ingreso ✅
-        document.getElementById("status").textContent =
-          `Ingreso registrado ✅ (${new Date(data.registro.ingreso).toLocaleTimeString()})`;
+        // animación
+        container.classList.add("active");
 
-        // Guardamos info del registro
-        window.currentRegistro = data.registro;
+        setTimeout(() => {
+          document.getElementById("login-container").classList.add("hidden");
+          document.getElementById("dashboard-container").classList.remove("hidden");
 
-        // botón PDF solo para DNI 41847034
-        if (dni === "41847034") {
-          document.getElementById("pdfBtn").classList.remove("hidden");
-        }
+          document.getElementById("status").textContent =
+            `Ingreso registrado ✅ (${new Date(data.registro.ingreso).toLocaleTimeString()})`;
+
+          window.currentRegistro = data.registro;
+
+          if (dni === "41847034") {
+            document.getElementById("pdfBtn").classList.remove("hidden");
+          }
+        }, 800);
       } else {
         error.textContent = data.msg;
       }
@@ -45,10 +51,11 @@ async function login() {
     console.error(err);
     error.textContent = "Error conectando con el servidor";
   }
-}
+});
 
 // LOGOUT
 function logout() {
+  container.classList.remove("active");
   document.getElementById("dashboard-container").classList.add("hidden");
   document.getElementById("login-container").classList.remove("hidden");
   document.getElementById("username").value = "";
@@ -59,8 +66,8 @@ function logout() {
   document.getElementById("pdfBtn").classList.add("hidden");
 }
 
-// REGISTRAR INGRESO manual (si querés permitirlo con botón extra)
-async function registrarIngreso() {
+// REGISTRAR INGRESO
+function registrarIngreso() {
   if (!window.currentRegistro) return;
   document.getElementById("status").textContent =
     `Ingreso registrado ✅ (${new Date().toLocaleTimeString()})`;
